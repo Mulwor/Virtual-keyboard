@@ -15,3 +15,4 @@ yarn build
 to bundle your application
 
 link: https://Mulwor.github.io/Virtual-keyboard/keyboard/index.html
+another_link: https://Mulwor.github.io/Virtual-keyboard/keyboard/index.html
