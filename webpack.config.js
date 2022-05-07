@@ -12,7 +12,10 @@ const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader
 
 
 const config = {
-    entry: './src/index.ts',
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './keyboard/scripts/script',
+    },
     devtool: 'source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -23,7 +26,7 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'index.html',
+            template: './keyboard/index.html',
         }),
 
         // Add your plugins here
