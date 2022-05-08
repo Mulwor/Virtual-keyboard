@@ -16,16 +16,18 @@ const digitCodes = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5
 
 let caps_lock = false;
 let shift = false;
-let language = sessionStorage.getItem('kl') ? sessionStorage.getItem('kl') : 'russian';
+let language = sessionStorage.getItem('chooseLanguage') ? sessionStorage.getItem('chooseLanguage') : 'rus';
 
 const klavitereishn = () => {
     let keyboard;
-    sessionStorage.setItem('kl', language);          // Свойство sessionStorage позволяет получить доступ к объекту Storage текущей сессии и добавляет данные в него используя setItem
-
-    if (language === 'russian') {                    // Если используем русскую клавиатуру
+    sessionStorage.setItem('chooseLanguage', language);          // Свойство sessionStorage позволяет получить доступ к объекту Storage текущей сессии и добавляет данные в него используя setItem
+    // Начальное положение клавиатуры
+    if (language === 'rus') {                        // Если используем русскую клавиатуру
         keyboard = forRussian;
+        // Если используем больше буквы
         if (caps_lock) {
             keyboard = forRussianCaps
+        // Если зажимаешь шифт
         } else if (shift) {
             keyboard = forRussianShift
         }
@@ -38,9 +40,10 @@ const klavitereishn = () => {
         }
     }
 
-    
-    if (!(document.activeElement == textArea)) {      // document.activeElement => Элемент, на котором будут вызываться события клавиатуры, если пользователь начнет ввод текста
-      textArea.focus ()                               // Элемент получает фокус, когда пользователь кликает по нему или использует клавишу Tab
+    // document.activeElement => Элемент, на котором будут вызываться события клавиатуры, если пользователь начнет ввод текста
+    if (!(document.activeElement == textArea)) {   
+      // Элемент получает фокус, когда пользователь кликает по нему или использует клавишу Tab  
+      textArea.focus ()                               
     }
 
     // Добавляем непосредственно саму клавиатуру
@@ -86,8 +89,8 @@ const klavitereishn = () => {
             classification = 'specialSpace'
           }
 
-      
-          collection += `<div class="key ${classification}" data-code="${value}">${keyboard[index]}</div>`;         // Вставляем класс к тегам
+          // Вставляем класс к тегам
+          collection += `<div class="key ${classification}" data-code="${value}">${keyboard[index]}</div>`;         
 
           // Следующий код гласит, в какой части элемента необходимо новая строка
           const breaks = [13, 27, 40, 53];
@@ -110,3 +113,52 @@ const klavitereishn = () => {
    klavitereishn_write();
   };
 klavitereishn();
+
+// Нажатие на клавиатуру
+function clickOnKeyboard (click) {
+  // Отмена действия браузера => для отмены действия браузера существует стандартный метод event.preventDefault().
+  click.preventDefault();
+    const newClick = {...click};
+    newClick.shiftOnKeyboard = click.shiftOnKeyboard
+    newClick.altOnKeyboard = click.altOnKeyboard
+    newClick.moreTimes = click.moreTimes
+    newClick.target = document.querySelector(`[data-code=${click.code}]`);
+    return newClick
+};
+
+function animation (click) {
+  const clicebel = click.target;
+  // getAttribute - получаем объект
+  if (clicebel && digitCodes.includes(clicebel.getAttribute('data-code'))) {
+    // добавляем класс
+    clicebel.classList.add('cartoon');
+  }
+}
+
+function clearHigh (click) {
+  const clicebel = click.target;
+  const definedKey = clicebel ? clicebel.getAttribute('data-code') : '';
+  if (definedKey === ('ShiftL' || 'ShiftR')) {
+    shift = false;
+    klavitereishn()
+  }
+  if (definedKey !== 'CapsLock' || caps === false) {
+    setTimeout(() => {
+      if (clicebel) {
+        // Возвращаем в первоначальный вариант
+        clicebel.classList.remove('cartoon');
+      }
+    });
+  }
+};
+
+
+
+// function clickOnKeyboard (click) {...}
+document.addEventListener('keydown', (click) => clickKeyboard(clickOnKeyboard(click)));
+// function animation (click) {...}
+document.addEventListener('mousedown', animation);
+// function writeOnKeyboard (click) {...} 
+document.addEventListener('mousedown', (click) => writeOnKeyboard(click));
+
+document.addEventListener('mouseup', (click) => clearHigh(click));

@@ -413,7 +413,7 @@ br {
     width: 83px;
 }
 .capsLock {
-    width: 107px;
+  width: 107px;
 }
 .specialEnter {
     width: 107px;
@@ -429,4 +429,8 @@ br {
 }
 .specialSpace {
     width: 343px;
+}
+.cartoon {
+  background-color: rgb(252,254,218);
+  transition: 0.3;
 }
