@@ -4,8 +4,8 @@ import { forRussian, forRussianCaps,  forRussianShift } from './rus.js'
 
 // Cоздания области, в которую я буду записать буковки и цифры
 const textArea = document.createElement('textarea');                      // В HTML-документах создаёт элемент c тем тегом, что указан в аргументе или HTMLUnknownElement, если имя тега не распознаётся.
-document.body.prepend(textArea);                                          // node.prepend(...nodes or strings) – вставляет узел в начало.
 textArea.setAttribute('placeholder', 'Привет дорогой друг, это моя первая работа с домом. \nПрошу тебя иди строга по кросс-чеку. Не придумывай ничего своего. \nБлагодарю')  // Текст, который будет находится внутри элемента => ::placeholder представляет собой текст placeholder (en-US) в <textarea> (en-US) элементах.
+document.body.prepend(textArea);                                          // node.prepend(...nodes or strings) – вставляет узел в начало.
 
 //Для будущей отрисовки самой клавиатуры
 const digitCodes = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 
@@ -31,7 +31,7 @@ const klavitereishn = () => {
         } else if (shift) {
             keyboard = forRussianShift
         }
-    } else if (language === 'english') {              // Если используем английскую клавиатуру
+    } else if (language === 'eng') {              // Если используем английскую клавиатуру
         keyboard = forEnglish;
         if (caps_lock) {
             keyboard = forEnglishCaps
@@ -70,23 +70,23 @@ const klavitereishn = () => {
         digitCodes.forEach((value, index) => {
           let classification = '';
           if (value === 'Backspace') {
-            classification = 'backspace special';
+            classification = 'backspace origin';
           } else if (value === 'Tab') {
-            classification = 'tab special';
+            classification = 'tab origin';
           } else if (value === 'Keyslesh') {
-            classification = 'keysleft';
+            classification = 'keysleft origin';
           } else if (value === 'CapsLock') {
-            classification = 'capsLock special';
+            classification = 'capsLock origin';
           } else if (value === 'Enter') {
-            classification = 'specialEnter'
+            classification = 'specialEnter origin'
           } else if (value === 'ShiftL') {
-            classification = 'specialShift'
+            classification = 'specialShift origin'
           } else if (value === 'ShiftR') {
-            classification = 'specialShiftTwo'
+            classification = 'specialShiftTwo origin'
           } else if (value === 'ControlLeft') {
-            classification = 'controlL'
+            classification = 'controlL origin'
           } else if (value === 'Space') {
-            classification = 'specialSpace'
+            classification = 'specialSpace origin'
           }
 
           // Вставляем класс к тегам
@@ -133,7 +133,7 @@ function animation (click) {
     // добавляем класс
     clicebel.classList.add('cartoon');
   }
-}
+};
 
 function clearHigh (click) {
   const clicebel = click.target;
@@ -148,17 +148,51 @@ function clearHigh (click) {
         // Возвращаем в первоначальный вариант
         clicebel.classList.remove('cartoon');
       }
-    });
+    }, 200);
   }
+};
+
+const clickKeyboard = (click) => {
+  animation (click)
+  if (click.shiftOnKeyboard && click.altOnKeyboard && !click.moreTimes ) {
+    language = (language === 'rus') ? 'eng' : 'rus';
+    return null;
+  }
+
+  const currentKeyCode = click.target ? click.target.getAttribute('data-code') : '';
+  const caret = textArea.selectionStart;
+
+  // Добавление символов на клавиатуру
+  if (click.target && [...click.target.classList].indexOf('origin') === -1 && [...click.target.classList].indexOf('key') !== -1) {
+    let letter = click.target.innerHTML;
+    letter = letter === 'Space' ? ' ' : letter;
+    textArea.value = textArea.value.substring(0, caret) + letter + textArea.value.substring(caret);
+    textArea.setSelectionRange(caret + 1, caret + 1);
+  }
+
+  // Необходимо что при нажатии на backspace текст удалял какой-либо элемиент
+  if (currentKeyCode === 'Backspace' && caret > 0) {
+    textArea.value = textArea.value.substring(0, caret - 1) + textArea.value.substring(caret);
+    textArea.setSelectionRange(caret - 1, caret - 1);
+  }
+
+  // При нажатии, чтобы все символы на экране отображался с большими буквами
+  if (currentKeyCode === 'CapsLock') {
+    caps_lock = !caps_lock;
+    klavitereishn();
+  }
+
+  if (currentKeyCode === ('ShiftL' || 'ShiftR')) {
+    shiftOnKeyboard = !shiftOnKeyboard
+    klavitereishn();
+  }
+  return null;
 };
 
 
 
-// function clickOnKeyboard (click) {...}
+document.addEventListener('keyup', (click) => clearHigh(clickOnKeyboard(click)));
 document.addEventListener('keydown', (click) => clickKeyboard(clickOnKeyboard(click)));
-// function animation (click) {...}
 document.addEventListener('mousedown', animation);
-// function writeOnKeyboard (click) {...} 
-document.addEventListener('mousedown', (click) => writeOnKeyboard(click));
-
+document.addEventListener('mousedown', (click) => clickKeyboard(click));
 document.addEventListener('mouseup', (click) => clearHigh(click));
