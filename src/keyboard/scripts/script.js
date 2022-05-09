@@ -178,14 +178,15 @@ const clickKeyboard = (click) => {
 
   // При нажатии, чтобы все символы на экране отображался с большими буквами
   if (currentKeyCode === 'CapsLock') {
-    caps_lock = !caps_lock;
+    caps_lock = true;
     klavitereishn();
   }
 
-  if (currentKeyCode === ('ShiftL' || 'ShiftR')) {
-    shiftOnKeyboard = !shiftOnKeyboard
+  if (currentKeyCode === 'ShiftL' || 'ShiftR') {
+    shift = true;
     klavitereishn();
   }
+
   return null;
 };
 
