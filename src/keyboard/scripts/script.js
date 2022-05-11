@@ -134,7 +134,10 @@ function animation(click) {
 function clearHigh(click) {
   const clicebel = click.target;
   const definedKey = clicebel ? clicebel.getAttribute('data-code') : '';
-  if (definedKey === ('ShiftL' || 'ShiftR')) {
+  if (definedKey ==='ShiftL' ) {
+    shift = false;
+    klavitereishn();
+  } else if (definedKey === 'ShiftR') {
     shift = false;
     klavitereishn();
   }
@@ -168,8 +171,11 @@ const clickOnKeyboard = (click) => {
 const clickKeyboard = (click) => {
   animation(click);
   if (click.shiftOnKeyboard && click.altOnKeyboard && !click.moreTimes) {
-    language = (language === 'rus') ? 'eng' : 'rus';
-    return null;
+    if (language == 'rus') {
+       'eng'
+    } else {
+       'rus'
+    }
   }
 
   const definedKey = click.target ? click.target.getAttribute('data-code') : '';
@@ -177,11 +183,15 @@ const clickKeyboard = (click) => {
 
   // Добавление символов на клавиатуру
   if (click.target && [...click.target.classList].indexOf('origin') === -1 && [...click.target.classList].indexOf('key') !== -1) {
-    let writeWords = click.target.innerHTML;
-    writeWords = writeWords === 'Space' ? ' ' : writeWords;
-    textArea.value = textArea.value.substring(0, write) + writeWords
-    + textArea.value.substring(write);
+    let spacendr = click.target.innerHTML;
+    textArea.value = textArea.value.substring(0, write) + spacendr + textArea.value.substring(write);
     textArea.setSelectionRange(write + 1, write + 1);
+  }
+
+  if (definedKey === 'Space') {
+    let spacendr = click.target.innerHTML;
+    spacendr = spacendr === 'Space' ? " " : spacendr;
+    textArea.value = textArea.value.substring(0, write) + spacendr + textArea.value.substring(write);
   }
 
   // Необходимо что при нажатии на backspace текст удалял какой-либо элемиент
@@ -196,18 +206,29 @@ const clickKeyboard = (click) => {
     klavitereishn();
   }
   // Работает только левый шифт, на будущее: необходимо, чтобы работал и правы
-  if (definedKey === ('ShiftL' || 'ShiftR')) {
-    if (!click.moreTimes) {
-      shift = true;
+  if (definedKey === 'ShiftL') {
+      shift =! shift;
       klavitereishn();
-    }
   }
+
+  if (definedKey === 'ShiftR') {
+      shift =! shift;
+      klavitereishn();
+  }
+
   if (definedKey === 'Tab') {
     const tabulation = textArea.selectionStart;
     textArea.value = `${textArea.value.substring(0, tabulation)}  ${textArea.value.substring(tabulation)}`;
     textArea.setSelectionRange(tabulation + 4, tabulation + 4);
   }
+
+  if (definedKey === 'Enter') {
+    textArea.value = `${textArea.value.substring(0, write)}\n${textArea.value.substring(write)}`;
+    textArea.setSelectionRange(write + 1, write + 1);
+    return null;
+  }
   return null;
+
 };
 
 document.addEventListener('keyup', (click) => clearHigh(clickOnKeyboard(click)));
