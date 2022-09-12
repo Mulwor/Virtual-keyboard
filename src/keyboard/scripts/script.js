@@ -2,125 +2,123 @@ import '../style.css';
 import { forEnglish, forEnglishCaps, forEnglishShift } from './eng.js';
 import { forRussian, forRussianCaps, forRussianShift } from './rus.js';
 
-// Cоздания области, в которую я буду записать буковки и цифры
-const textArea = document.createElement('textarea'); // В HTML-документах создаёт элемент c тем тегом, что указан в аргументе или HTMLUnknownElement, если имя тега не распознаётся.
-textArea.setAttribute('placeholder', 'Привет дорогой друг, это моя первая работа с домом. \nПрошу тебя иди строга по кросс-чеку. Не придумывай ничего своего. \nБлагодарю'); // Текст, который будет находится внутри элемента => ::placeholder представляет собой текст placeholder (en-US) в <textarea> (en-US) элементах.
-document.body.prepend(textArea); // node.prepend(...nodes or strings) – вставляет узел в начало.
+// Add textArea special for virtual-keyboard
+const textArea = document.createElement('textarea');
+textArea.setAttribute('placeholder', 'Welcome to first pet-project: Virtual-keyboard');
+document.body.prepend(textArea); // Метод prepend позволяет вставить в начало какого-либо элемента другой элемент.
 
-// Для будущей отрисовки самой клавиатуры
-const digitCodes = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
-  'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'Key{', 'Key}', 'Keyslesh',
-  'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Double-colon', 'Quote', 'Enter',
-  'ShiftL', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Point', 'Question', 'ArrowUp', 'ShiftR',
-  'ControlLeft', 'Win', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'];
+const digitCodes = [
+    'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6',
+    'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
+
+    'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU',
+    'KeyI', 'KeyO', 'KeyP', 'Key{', 'Key}', 'Keyslesh',
+
+    'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ',
+    'KeyK', 'KeyL', 'Double-colon', 'Quote', 'Enter',
+
+    'ShiftL', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM',
+    'Comma', 'Point', 'Question', 'ArrowUp', 'ShiftR',
+
+    'ControlLeft', 'Win', 'AltLeft', 'Space', 'AltRight',
+    'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'
+];
 
 let capsLock = false;
 let shift = false;
+
+// sessionStorage — хранить данные в браузере
 let language = sessionStorage.getItem('chooseLanguage') ? sessionStorage.getItem('chooseLanguage') : 'rus';
 
-const klavitereishn = () => {
-  let keyboard;
-  sessionStorage.setItem('chooseLanguage', language); /* Свойство sessionStorage позволяет
-  получить доступ к объекту Storage текущей сессии и добавляет данные в него используя setItem */
-  // Начальное положение клавиатуры
-  if (language === 'rus') { // Если используем русскую клавиатуру
-    keyboard = forRussian;
-    // Если используем больше буквы
-    if (capsLock) {
-      keyboard = forRussianCaps;
-      // Если зажимаешь шифт
-    } else if (shift) {
-      keyboard = forRussianShift;
-    }
-  } else if (language === 'eng') { // Если используем английскую клавиатуру
-    keyboard = forEnglish;
-    if (capsLock) {
-      keyboard = forEnglishCaps;
-    } else if (shift) {
-      keyboard = forEnglishShift;
-    }
-  }
+const initKeyboard = () => {
+    sessionStorage.setItem('chooseLanguage', language);
 
-  /* document.activeElement => Элемент, на котором будут вызываться
-  события клавиатуры, если пользователь начнет ввод текста */
-  if (!(document.activeElement === textArea)) {
-    // Элемент получает фокус, когда пользователь кликает по нему или использует клавишу Tab
-    textArea.focus();
-  }
-
-  // Добавляем непосредственно саму клавиатуру
-  const klavitereishnWrite = () => {
-    /* Document метод querySelector() возвращает первый элемент
-    (Element) документа, который соответствует указанному селектору или группе селекторов
-    */
-    let laptopKeyboard = document.querySelector('.keyboard');
-    if (laptopKeyboard) {
-      let breaks = 0;
-      for (let set = 0; set < laptopKeyboard.children.length; set += 1) {
-        if (laptopKeyboard.children[set].nodeName !== 'DIV') {
-          breaks += 1;
-        } else {
-          laptopKeyboard.children[set].innerHTML = keyboard[set - breaks];
+    let keyboard;
+      if (language === 'rus') {
+        keyboard = forRussian;
+        if (capsLock) {
+          keyboard = forRussianCaps;
+        } else if (shift) {
+          keyboard = forRussianShift;
+        }
+      } else if (language === 'eng') {
+        keyboard = forEnglish;
+        if (capsLock) {
+          keyboard = forEnglishCaps;
+        } else if (shift) {
+          keyboard = forEnglishShift;
         }
       }
-    } else {
-      // Создаем непосредственно саму клавиатуру
-      laptopKeyboard = document.createElement('div');
-      let collection = '';
-      laptopKeyboard.classList.add('keyboard');
 
-      laptopKeyboard.addEventListener('mousedown', (click) => {
-        click.preventDefault();
-      });
+    const CheckStatus = () => {
+        let laptopKeyboard = document.querySelector('.keyboard');
 
-      // Обращаемся к строке 47 и просим нарисовать все элементы c классами
-      digitCodes.forEach((value, index) => {
-        let classification = '';
-        if (value === 'Backspace') {
-          classification = 'backspace origin';
-        } else if (value === 'Tab') {
-          classification = 'tab origin';
-        } else if (value === 'Keyslesh') {
-          classification = 'keysleft origin';
-        } else if (value === 'CapsLock') {
-          classification = 'capsLock origin';
-        } else if (value === 'Enter') {
-          classification = 'specialEnter origin';
-        } else if (value === 'ShiftL') {
-          classification = 'specialShift origin';
-        } else if (value === 'ShiftR') {
-          classification = 'specialShiftTwo origin';
-        } else if (value === 'ControlLeft') {
-          classification = 'controlL origin';
-        } else if (value === 'Space') {
-          classification = 'specialSpace origin';
-        }
+        if (laptopKeyboard) {
+          let breaks = 0;
 
-        // Вставляем класс к тегам
-        collection += `<div class="key ${classification}" data-code="${value}">${keyboard[index]}</div>`;
+          for (let set = 0; set < laptopKeyboard.children.length; set += 1) {
+            if (laptopKeyboard.children[set].nodeName !== 'DIV') {
+              breaks += 1;
+            } else {
+              laptopKeyboard.children[set].innerHTML = keyboard[set - breaks];
+            }
+          }
 
-        // Следующий код гласит, в какой части элемента необходимо новая строка
+        } else {
+          laptopKeyboard = document.createElement('div');
+          laptopKeyboard.classList.add('keyboard');
+          let collection = '';
+
+          laptopKeyboard.addEventListener('mousedown', (click) => {
+            click.preventDefault();
+          });
+
+
+        digitCodes.forEach((value, index) => {
+          let classification = '';
+          if (value === 'Backspace') {
+            classification = 'backspace origin';
+          } else if (value === 'Tab') {
+            classification = 'tab origin';
+          } else if (value === 'Keyslesh') {
+            classification = 'keysleft origin';
+          } else if (value === 'CapsLock') {
+            classification = 'capsLock origin';
+          } else if (value === 'Enter') {
+            classification = 'specialEnter origin';
+          } else if (value === 'ShiftL') {
+            classification = 'specialShift origin';
+          } else if (value === 'ShiftR') {
+            classification = 'specialShiftTwo origin';
+          } else if (value === 'ControlLeft') {
+            classification = 'controlL origin';
+          } else if (value === 'Space') {
+            classification = 'specialSpace origin';
+          }
+
+        // Add class in tag and letters gap
+        collection += `<div class= "key ${classification}" data-code="${value}"> ${ keyboard[index] }</div>`;
+
         const breaks = [13, 27, 40, 53];
         if (breaks.includes(index)) {
           collection += '<br>';
         }
       });
 
-      // innerHtml получает HTML рамзетку
-      laptopKeyboard.innerHTML = collection;
-      /* Document метод querySelector() возвращает первый элемент (Element)
-       документа, который соответствует указанному селектору или группе селекторов */
-      const exist = document.querySelector('.keyboard');
-      if (exist) {
-        exist.replaceWith(laptopKeyboard); // Метод .replaceWith() заменяет одни элементы другими.
-      } else {
-        textArea.after(laptopKeyboard); // Метод .after() добавляет текст после заданного элемента.
-      }
-    }
-  };
-  klavitereishnWrite();
+        // Свойство innerHTML позволяет считать содержимое элемента в виде HTML-строки или установить новый HTML.
+        laptopKeyboard.innerHTML = collection;
+
+        const exist = document.querySelector('.keyboard');
+        if (exist) {
+          exist.replaceWith(laptopKeyboard);
+        } else {
+          textArea.after(laptopKeyboard);
+        }
+        }
+      };
+      CheckStatus();
 };
-klavitereishn();
+initKeyboard();
 
 function animation(click) {
   const clicebel = click.target;
@@ -136,10 +134,10 @@ function clearHigh(click) {
   const definedKey = clicebel ? clicebel.getAttribute('data-code') : '';
   if (definedKey ==='ShiftL' ) {
     shift = false;
-    klavitereishn();
+    initKeyboard();
   } else if (definedKey === 'ShiftR') {
     shift = false;
-    klavitereishn();
+    initKeyboard();
   }
   if (definedKey !== 'CapsLock' || capsLock === false) {
     setTimeout(() => {
@@ -203,17 +201,17 @@ const clickKeyboard = (click) => {
   // При нажатии, чтобы все символы на экране отображался с большими буквами
   if (definedKey === 'CapsLock') {
     capsLock = !capsLock;
-    klavitereishn();
+    initKeyboard();
   }
   // Работает только левый шифт, на будущее: необходимо, чтобы работал и правы
   if (definedKey === 'ShiftL') {
       shift =! shift;
-      klavitereishn();
+    initKeyboard();
   }
 
   if (definedKey === 'ShiftR') {
       shift =! shift;
-      klavitereishn();
+      initKeyboard();
   }
 
   if (definedKey === 'Tab') {
